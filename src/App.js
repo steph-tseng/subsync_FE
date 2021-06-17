@@ -1,25 +1,52 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import "./App.css";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import Homepage from "./pages/Homepage";
+import PublicNavbar from "./components/PublicNavbar";
+import { createMuiTheme, ThemeProvider } from "@material-ui/core";
 
-function App() {
+let theme = createMuiTheme({
+  palette: {
+    primary: {
+      light: "#a3c0d6",
+      main: "#7b99bd",
+      dark: "#36558a",
+      disabled: "#a1b3c2",
+      hover: "#97b6cf",
+      contrastText: "#000",
+    },
+    secondary: {
+      main: "#1a2d4e",
+    },
+    tertiary: {
+      light: "#d5daf9",
+      main: "#6a75a3",
+      dark: "#8b97cc",
+      disabled: "#99a2c7",
+      contrastText: "#fff",
+    },
+    text: {
+      primary: "#000",
+      secondary: "#fff",
+    },
+  },
+  // typography: {
+  //   fontFamily: ["Arvo", "Raleway"],
+  // },
+});
+
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+      <Router>
+        <PublicNavbar />
+
+        <Switch>
+          <Route exact path="/" component={Homepage} />
+        </Switch>
+      </Router>
+    </ThemeProvider>
   );
-}
+};
 
 export default App;
