@@ -4,6 +4,7 @@ import { useState } from "react";
 const useStyles = makeStyles((theme) => ({
   textBox: {
     width: "95%",
+    height: "100%",
   },
 }));
 
@@ -22,6 +23,8 @@ export const TextEditor = () => {
         value={formData.content}
         onChange={handleChange}
         className={classes.textBox}
+        placeholder="SRT File Editor"
+        multiline
       />
     </form>
   );
