@@ -1,29 +1,34 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 // import { Cloudinary } from "@cloudinary/base";
 // import cloudinary from "https://upload-widget.cloudinary.com/global/all.js";
-import { TextField, makeStyles, Typography } from "@material-ui/core";
+import { TextField, makeStyles, Typography, Button } from "@material-ui/core";
 import { FilePond, File, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
-import axios from "axios";
 import { v4 } from "uuid";
 import Grid from "@material-ui/core/Grid";
-import { TextEditor } from "../components/TextEditor";
-
-const BACKEND_API = process.env.BACKEND_API;
+// import { TextEditor } from "../components/TextEditor";
+import videoActions from "../redux/actions/video.actions";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    marginTop: theme.spacing(15),
+    marginTop: "20vh",
     // justifyContent: "space-between",
   },
   uploader: {
-    justifyContent: "flex-start",
+    height: "50vh",
   },
   editor: {
     paddingLeft: theme.spacing(5),
   },
   linkField: {
     marginTop: theme.spacing(3),
+  },
+  btn: {
+    width: "100%",
+    "&:hover": {
+      backgroundColor: theme.palette.primary.light,
+    },
   },
 }));
 
@@ -33,39 +38,23 @@ const Homepage = () => {
   const [formData, setFormData] = useState({ link: "" });
   const [link, setLink] = useState("");
   // var file = files.filter((x) => x.includes(".mp4"))[0];
-
+  const dispatch = useDispatch();
   const [errors, setErrors] = useState("");
   const [success, setSuccess] = useState(false);
+
   const onSubmit = (e) => {
     e.preventDefault();
     setErrors("");
-    if (files && files.length > 0) {
-      let photoFolder = new FormData();
-      photoFolder.append("photo", files[0].file);
-      photoFolder.append("folder", new Date());
-      photoFolder.append("user", v4());
+    if (files) {
+      // let photoFolder = new FormData();
+      // photoFolder.append("photo", files[0].file);
+      // photoFolder.append("folder", new Date());
+      // photoFolder.append("user", v4());
       setErrors("Sending File");
-      axios
-        .post(`${BACKEND_API}/upload`, photoFolder, {})
-        .then((res) => {
-          console.log(res.data);
-          if (res.data.errors) {
-            setErrors(res.data.errors);
-          } else if (res.data.success) {
-            setSuccess(true);
-          }
-        })
-        .catch((e) => setErrors(e));
+      console.log(files);
+      dispatch(videoActions.uploadFile(files));
     } else {
-      setErrors("Please select an image file first.");
-    }
-  };
-
-  const renderErrors = () => {
-    if (errors !== "") {
-      return <div>{errors}</div>;
-    } else {
-      return null;
+      setErrors("Please select a file first.");
     }
   };
 
@@ -82,26 +71,46 @@ const Homepage = () => {
     setFormData({ link: "" });
   };
 
-  formData.link ? getId(formData.link) : console.log("nothing");
+  const onFileChange = (e) => {
+    setFiles(e.target.files[0]);
+  };
+
+  // formData.link ? getId(formData.link) : console.log("nothing");
 
   return (
-    <Grid container className={classes.root}>
+    <Grid container className={classes.root} justify="center">
       <Grid item lg={12}>
         <Typography></Typography>
       </Grid>
-      <Grid item lg={6} className={classes.uploader}>
-        <form onSubmit={onSubmit}>
+      <Grid item sm={10} lg={8}>
+        <form enctype="multipart/form-data">
+          {/* <input type="file" onChange={onFileChange} /> */}
           <FilePond
             files={files}
-            onupdatefiles={setFiles}
+            onupdatefiles={(files) => setFiles(files[0].file)}
             allowMultiple={true}
-            maxFiles={3}
-            server={BACKEND_API}
+            maxFiles={2}
+            instantUpload={false}
+            allowReorder={true}
+            // server="api/video/"
             name="files"
             labelIdle="Drag & Drop your files"
+            className={classes.uploader}
           />
+          <Button
+            onClick={onSubmit}
+            variant="outlined"
+            style={{}}
+            className={classes.btn}
+          >
+            Upload
+          </Button>
         </form>
-        {renderErrors()}
+        {errors ? (
+          <Typography textAlign="center">{errors}</Typography>
+        ) : (
+          <div></div>
+        )}
         {success ? (
           // <iframe
           //   title="Video Preview"
@@ -129,7 +138,7 @@ const Homepage = () => {
               labelIdle="Drag & Drop your files"
               onSubmit={onSubmit}
             /> */}
-            <TextField
+            {/* <TextField
               name="link"
               value={formData.link}
               onChange={handleChange}
@@ -137,21 +146,21 @@ const Homepage = () => {
               style={{ width: "100%" }}
               placeholder="Link to youtube video"
               className={classes.linkField}
-            />
+            /> */}
           </>
         )}
       </Grid>
-      <Grid item md={6} lg={6} className={classes.editor}>
-        {/* <Typography>SRT File Editor</Typography> */}
-        {/* <DocumentEditorContainerComponent
+      {/* <Grid item md={6} lg={6} className={classes.editor}> */}
+      {/* <Typography>SRT File Editor</Typography> */}
+      {/* <DocumentEditorContainerComponent
           id="container"
           style={{ height: "590px" }}
           serviceUrl="https://ej2services.syncfusion.com/production/web-services/api/documenteditor/"
           enableToolbar={true}
         /> */}
-        <TextEditor />
-      </Grid>
-      <Grid item lg={12}></Grid>
+      {/* <TextEditor /> */}
+      {/* </Grid> */}
+      {/* <Grid item lg={12}></Grid> */}
     </Grid>
   );
 };
